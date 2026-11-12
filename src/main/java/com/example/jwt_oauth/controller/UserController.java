@@ -1,5 +1,6 @@
 package com.example.jwt_oauth.controller;
 
+import com.example.jwt_oauth.dto.TokenDTO;
 import com.example.jwt_oauth.model.User;
 import com.example.jwt_oauth.service.IUserService;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,11 @@ public class UserController {
     @PostMapping("/users")
     public ResponseEntity<User> add(@RequestBody User user) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.addUser(user));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<TokenDTO> login(@RequestBody User user) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.login(user));
     }
 
 }

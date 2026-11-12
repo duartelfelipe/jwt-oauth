@@ -18,7 +18,12 @@ public class WebSecurityConfig {
                 //desabilita security para customizacao
                 .csrf((csrf) -> csrf.disable())
                 .authorizeHttpRequests((auth) -> {
-                    auth.requestMatchers(HttpMethod.GET, "/open").permitAll().anyRequest().authenticated();
+                    auth
+                            .requestMatchers(HttpMethod.GET, "/open").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                            .anyRequest()
+                            .authenticated();
                 })
                 .addFilterBefore(new SecurityFilter(), UsernamePasswordAuthenticationFilter.class);
 
