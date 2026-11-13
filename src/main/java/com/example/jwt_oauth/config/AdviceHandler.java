@@ -25,4 +25,11 @@ public class AdviceHandler {
                 new AdviceDTO(ex.getMessage())
         );
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<AdviceDTO> handleRuntimeException(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new AdviceDTO(ex.getMessage())
+        );
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.jwt_oauth.service;
 
+import com.example.jwt_oauth.config.security.TokenUtil;
 import com.example.jwt_oauth.dto.TokenDTO;
 import com.example.jwt_oauth.model.User;
 import com.example.jwt_oauth.repo.UserRepo;
@@ -21,11 +22,15 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public User addUser(User user) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        user.setPassword(
-                encoder.encode(user.getPassword())
-        );
-        return repo.save(user);
+        try {
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            user.setPassword(
+                    encoder.encode(user.getPassword())
+            );
+            return repo.save(user);
+        } catch (Exception ex) {
+            throw new RuntimeException("Unexpected error.", ex);
+        }
     }
 
     @Override
@@ -41,7 +46,7 @@ public class UserServiceImpl implements IUserService {
 
         BCryptPasswordEncoder encode = new BCryptPasswordEncoder();
         if (encode.matches(user.getPassword(), baseUser.getPassword())) {
-            return new TokenDTO("security123");
+            return TokenUtil.encode(user);
         }
 
         throw new BadCredentialsException("Unauthorized user: " + user.getUsername());
