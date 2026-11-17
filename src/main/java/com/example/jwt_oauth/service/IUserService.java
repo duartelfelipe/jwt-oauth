@@ -7,4 +7,5 @@ public interface IUserService {
     User addUser(User user);
     User getByUsername(String username);
     TokenDTO login(User user);
+    TokenDTO googleLogin(TokenDTO token);
 }

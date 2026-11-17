@@ -1,6 +1,4 @@
-package com.example.jwt_oauth;
-
-import org.springframework.data.crossstore.ChangeSetPersister;
+package com.example.jwt_oauth.exception;
 
 import java.util.NoSuchElementException;
 

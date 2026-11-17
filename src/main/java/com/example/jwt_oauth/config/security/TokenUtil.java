@@ -2,12 +2,15 @@ package com.example.jwt_oauth.config.security;
 
 import com.example.jwt_oauth.dto.TokenDTO;
 import com.example.jwt_oauth.model.User;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
-import org.hibernate.id.SequenceMismatchStrategy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
@@ -21,6 +24,7 @@ public class TokenUtil {
     private static final String ISSUER = "LuizFelipe";
     private static final long EXPIRATION = 60 * 1000; //60 segundos
     private static final String SECRET_KEY = "0123456789012345678901234567890123456789";
+    private static final String GOOGLE_CLIENT_ID = "";
 
 
     public static Authentication decode(HttpServletRequest request) {
@@ -53,6 +57,38 @@ public class TokenUtil {
                 .signWith(key)
                 .compact();
         return new TokenDTO(jwtToken);
+    }
+
+    public static GoogleIdToken.Payload decodeGoogleToken(String token) {
+        try {
+            GoogleIdTokenVerifier verifier =
+                    new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
+                    .setAudience(Collections.singletonList(GOOGLE_CLIENT_ID))
+                    .build();
+
+            // O método verify faz TODAS as validações: Assinatura, iss, aud e exp
+            GoogleIdToken idToken = verifier.verify(token);
+
+            if (idToken != null) {
+                GoogleIdToken.Payload payload = idToken.getPayload();
+
+                // Extraindo dados úteis do usuário
+                String email = payload.getEmail();
+                boolean emailVerified = payload.getEmailVerified();
+                String name = (String) payload.get("name");
+                String googleId = payload.getSubject(); // ID único do usuário no Google
+
+                if (!emailVerified) {
+                    throw new SecurityException("E-mail do Google não verificado.");
+                }
+
+                return payload; // Token válido e verificado!
+            } else {
+                throw new SecurityException("Token do Google inválido.");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Falha ao validar o token do Google: " + e.getMessage(), e);
+        }
     }
 
 }

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+<h1>Login OAuth2.0 Google</h1>
+
+<!-- 1. Carregue a biblioteca do Google Identity -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+
+<!-- 2. Div onde o botão será renderizado -->
+<div id="g_id_onload"
+     data-client_id="225408596313-nm380m9s81kn5ae2mgv0gi595166gj1g.apps.googleusercontent.com"
+     data-callback="handleCredentialResponse"
+     data-auto_prompt="false">
+</div>
+
+<div class="g_id_signin"
+     data-type="standard"
+     data-size="large"
+     data-theme="outline"
+     data-text="signin_with"
+     data-shape="rectangular"
+     data-logo_alignment="left">
+</div>
+
+<!-- 3. Script para lidar com a resposta do login -->
+<!-- <script>
+    function handleCredentialResponse(response) {
+        console.log("JWT ID Token recebido: " + response.credential);
+        // Aqui você envia o token para seu backend para autenticar o usuário
+    }
+</script> -->
+<!-- 3. Script para lidar com a resposta do login -->
+<script>
+    async function handleCredentialResponse(response) {
+        console.log("JWT ID Token recebido: " + response.credential);
+
+        try {
+            // Substitua '/api/auth/google' pelo endpoint exato configurado no seu backend Java/Quarkus/Spring/etc.
+            const apiResponse = await fetch('http://localhost:8080/login/google', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token: response.credential })
+            });
+
+            if (!apiResponse.ok) {
+                throw new Error(`Erro na comunicação com o servidor: ${apiResponse.status}`);
+            }
+
+            const data = await apiResponse.json();
+            console.log("Usuário autenticado com sucesso no backend:", data);
+
+            // Exemplo: Salvar um token de sessão próprio do seu backend ou redirecionar o usuário
+            // localStorage.setItem('authToken', data.token);
+            // window.location.href = '/dashboard.html';
+
+        } catch (error) {
+            console.error("Falha ao enviar o token para o backend:", error);
+            alert("Não foi possível realizar o login. Tente novamente mais tarde.");
+        }
+    }
+</script>
+</body>
+</html>

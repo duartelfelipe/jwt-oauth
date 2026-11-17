@@ -4,11 +4,11 @@ import com.example.jwt_oauth.config.security.TokenUtil;
 import com.example.jwt_oauth.dto.TokenDTO;
 import com.example.jwt_oauth.model.User;
 import com.example.jwt_oauth.repo.UserRepo;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.AccessDeniedException;
 import java.util.NoSuchElementException;
 
 @Service
@@ -50,5 +50,14 @@ public class UserServiceImpl implements IUserService {
         }
 
         throw new BadCredentialsException("Unauthorized user: " + user.getUsername());
+    }
+
+    @Override
+    public TokenDTO googleLogin(TokenDTO token) {
+        GoogleIdToken.Payload payload = TokenUtil.decodeGoogleToken(token.token());
+
+        return TokenUtil.encode(
+                new User(payload.getEmail())
+        );
     }
 }

@@ -28,4 +28,8 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.login(user));
     }
 
+    @PostMapping("/login/google")
+    public ResponseEntity<TokenDTO> login(@RequestBody TokenDTO token) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.googleLogin(token));
+    }
 }

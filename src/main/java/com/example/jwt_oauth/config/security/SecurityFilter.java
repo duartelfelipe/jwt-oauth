@@ -15,6 +15,12 @@ public class SecurityFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         IO.println("Passou pelo ScurityFilter: " + request.getRequestURL());
 
+        // Se for uma requisição OPTIONS (Preflight do CORS), passa direto sem validar token
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if (request.getHeader("Authorization") != null ) {
             Authentication token = TokenUtil.decode(request);
             if (token != null) {
